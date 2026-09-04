@@ -2,6 +2,8 @@
 
 > **A production-grade, security-first personal AI operating system and intelligent journal powered by Google Gemini and Cloud Firestore.**
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fpushka2006%2Fgemini-lifeos)
+
 ---
 
 ## 🌟 Overview
