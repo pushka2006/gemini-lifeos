@@ -1,6 +1,10 @@
 import { ChatMessage, ExtractedTask, JournalEntry, DailyReflection, MorningBriefData } from '../types';
 
-const API_BASE = (typeof window !== 'undefined' && import.meta.env.VITE_API_URL) ? import.meta.env.VITE_API_URL : 'http://localhost:5000';
+const API_BASE = (typeof window !== 'undefined' && import.meta.env.VITE_API_URL)
+  ? import.meta.env.VITE_API_URL
+  : (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+    ? 'http://localhost:5000'
+    : '';
 
 async function getAuthHeaders(idToken?: string): Promise<Record<string, string>> {
   const token = idToken || localStorage.getItem('lifeos_auth_token') || 'dev-mock-token-user-1';
