@@ -1,3 +1,6 @@
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -6,6 +9,10 @@ import { initializeFirebaseAdmin } from './middleware/auth.js';
 import { aiRouter } from './routes/ai.js';
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const clientDist = path.resolve(__dirname, '../../dist');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -52,8 +59,17 @@ app.get('/api/health', (_req: Request, res: Response) => {
 // Mount AI Routes
 app.use('/api/ai', aiRouter);
 
-// 404 Handler
-app.use((_req: Request, res: Response) => {
+// Serve frontend client if built (e.g. in containerized Cloud Run deployment)
+if (fs.existsSync(clientDist)) {
+  app.use(express.static(clientDist));
+  app.get('*', (req: Request, res: Response, next: NextFunction) => {
+    if (req.path.startsWith('/api/')) return next();
+    res.sendFile(path.join(clientDist, 'index.html'));
+  });
+}
+
+// 404 Handler for undefined API routes
+app.use('/api/*', (_req: Request, res: Response) => {
   res.status(404).json({
     error: 'NotFound',
     message: 'The requested API endpoint does not exist.',

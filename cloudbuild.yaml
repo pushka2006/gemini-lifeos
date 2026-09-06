@@ -1,0 +1,28 @@
+steps:
+  # Build Docker Image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/gemini-lifeos:$COMMIT_SHA', '.']
+
+  # Push image to Google Container Registry / Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/gemini-lifeos:$COMMIT_SHA']
+
+  # Deploy to Cloud Run with required verification label
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'gemini-lifeos'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/gemini-lifeos:$COMMIT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--labels'
+      - 'dev-tutorial=cloud-run-ai-challenge'
+
+images:
+  - 'gcr.io/$PROJECT_ID/gemini-lifeos:$COMMIT_SHA'
